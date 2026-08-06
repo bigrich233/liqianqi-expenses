@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>李安琪 · 花费记账</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f3efe8;
+      --bg-deep: #e8e1d6;
+      --ink: #1c1915;
+      --muted: #6b645a;
+      --line: #d5cdc0;
+      --surface: rgba(255, 252, 247, 0.92);
+      --accent: #0f6b5c;
+      --danger: #b42318;
+      --shadow: 0 18px 50px rgba(28, 25, 21, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: "Noto Sans SC", "DM Sans", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(15, 107, 92, 0.12), transparent 28%),
+        radial-gradient(circle at 88% 8%, rgba(196, 120, 68, 0.14), transparent 26%),
+        linear-gradient(165deg, var(--bg) 0%, var(--bg-deep) 100%);
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 64px;
+    }
+
+    header {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 22px;
+      animation: rise 0.55s ease both;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      letter-spacing: 0.02em;
+      font-weight: 700;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+      max-width: 40rem;
+      line-height: 1.6;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      animation: rise 0.6s ease both;
+    }
+
+    .toolbar .label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-right: 2px;
+    }
+
+    .month-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .month-btn {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+    }
+
+    .month-btn:hover { border-color: var(--accent); }
+    .month-btn:active { transform: scale(0.98); }
+
+    .month-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+      animation: rise 0.65s ease both;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid rgba(213, 205, 192, 0.8);
+      border-radius: var(--radius);
+      padding: 18px 18px 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-bottom: 8px;
+    }
+
+    .stat .value {
+      font-family: "DM Sans", "Noto Sans SC", sans-serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .stat.accent .value { color: var(--accent); }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid rgba(213, 205, 192, 0.85);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+      animation: rise 0.75s ease both;
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: 140px 1fr 180px auto;
+      gap: 12px;
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    input[type="file"],
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font: inherit;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 107, 92, 0.12);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: end;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease, background 0.2s;
+    }
+
+    button:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      min-width: 96px;
+    }
+
+    .btn-primary:hover { opacity: 0.92; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid transparent;
+      padding: 8px 10px;
+      font-size: 0.86rem;
+    }
+
+    .btn-danger:hover { background: rgba(180, 35, 24, 0.08); }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+
+    th {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+      background: rgba(243, 239, 232, 0.7);
+      letter-spacing: 0.02em;
+    }
+
+    tbody tr {
+      animation: fade-in 0.35s ease both;
+    }
+
+    tbody tr:hover { background: rgba(216, 239, 233, 0.35); }
+
+    .date-cell {
+      font-family: "DM Sans", "Noto Sans SC", sans-serif;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .amount, .share {
+      font-family: "DM Sans", "Noto Sans SC", sans-serif;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .share { color: var(--accent); }
+
+    .detail {
+      max-width: 280px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .thumb {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      cursor: zoom-in;
+      background: #fff;
+      transition: transform 0.2s ease;
+    }
+
+    .thumb:hover { transform: scale(1.04); }
+
+    .no-img {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .empty {
+      padding: 48px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      animation: rise 0.85s ease both;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 16, 14, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 50;
+      cursor: zoom-out;
+    }
+
+    .lightbox.open { display: flex; animation: fade-in 0.2s ease; }
+    .lightbox img {
+      max-width: min(920px, 100%);
+      max-height: 88vh;
+      border-radius: 14px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 800px) {
+      .summary { grid-template-columns: 1fr; }
+      .form {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+      }
+      .actions { justify-content: stretch; }
+      .actions button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>李安琪 · 花费记账</h1>
+      <p>每笔花费按金额自动 AA：李明聪与张馥璐各承担一半。日期按录入当天计算。</p>
+    </header>
+
+    <div class="toolbar">
+      <span class="label">按月筛选</span>
+      <div class="month-filters" id="monthFilters"></div>
+    </div>
+
+    <section class="summary">
+      <div class="stat">
+        <div class="label" id="sumTotalLabel">总花费</div>
+        <div class="value" id="sumTotal">¥0.00</div>
+      </div>
+      <div class="stat accent">
+        <div class="label" id="sumLiLabel">李明聪应付（合计）</div>
+        <div class="value" id="sumLi">¥0.00</div>
+      </div>
+      <div class="stat accent">
+        <div class="label" id="sumZhangLabel">张馥璐应付（合计）</div>
+        <div class="value" id="sumZhang">¥0.00</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <form class="form" id="recordForm">
+        <label>
+          金额（元）
+          <input id="amount" type="number" min="0" step="0.01" placeholder="100" required />
+        </label>
+        <label>
+          明细
+          <input id="detail" type="text" placeholder="例如：奶粉、衣服、体检…" required />
+        </label>
+        <label>
+          附图
+          <input id="image" type="file" accept="image/*" />
+        </label>
+        <div class="actions">
+          <button class="btn-primary" type="submit">添加</button>
+          <button class="btn-ghost" type="button" id="exportBtn" title="导出备份">导出</button>
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>金额</th>
+              <th>明细</th>
+              <th>附图</th>
+              <th>李明聪</th>
+              <th>张馥璐</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div class="empty" id="emptyState">还没有记录，先添加第一笔花费吧。</div>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      确认后的记录保存在同目录的 data.js 和 receipts 文件夹中（会随 iCloud 同步）。你也可以在本页继续手动添加；建议定期「导出」备份。
+    </p>
+  </div>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <img id="lightboxImg" alt="附图预览" />
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    const STORAGE_KEY = "liqianqi_expense_records_v1";
+    const VERSION_KEY = "liqianqi_expense_data_version_v1";
+    const FILTER_KEY = "liqianqi_expense_month_filter_v1";
+
+    const amountInput = document.getElementById("amount");
+    const detailInput = document.getElementById("detail");
+    const imageInput = document.getElementById("image");
+    const form = document.getElementById("recordForm");
+    const tbody = document.getElementById("tbody");
+    const emptyState = document.getElementById("emptyState");
+    const monthFilters = document.getElementById("monthFilters");
+    const sumTotal = document.getElementById("sumTotal");
+    const sumLi = document.getElementById("sumLi");
+    const sumZhang = document.getElementById("sumZhang");
+    const sumTotalLabel = document.getElementById("sumTotalLabel");
+    const sumLiLabel = document.getElementById("sumLiLabel");
+    const sumZhangLabel = document.getElementById("sumZhangLabel");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightboxImg");
+    const exportBtn = document.getElementById("exportBtn");
+
+    /** @type {{id:string, date?:string, amount:number, detail:string, image:string|null, createdAt:string}[]} */
+    let records = loadRecords();
+    let activeMonth = localStorage.getItem(FILTER_KEY) || "all";
+
+    function fileRecords() {
+      const data = window.EXPENSE_DATA;
+      if (!data || !Array.isArray(data.records)) return [];
+      return data.records.slice();
+    }
+
+    function fileVersion() {
+      return window.EXPENSE_DATA && window.EXPENSE_DATA.version != null
+        ? String(window.EXPENSE_DATA.version)
+        : "0";
+    }
+
+    function loadRecords() {
+      const version = fileVersion();
+      const storedVersion = localStorage.getItem(VERSION_KEY);
+      if (storedVersion !== version) {
+        const fromFile = fileRecords();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fromFile));
+        localStorage.setItem(VERSION_KEY, version);
+        return fromFile;
+      }
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch {
+        /* fall through */
+      }
+      return fileRecords();
+    }
+
+    function saveRecords() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      localStorage.setItem(VERSION_KEY, fileVersion());
+    }
+
+    function pad2(n) {
+      return String(n).padStart(2, "0");
+    }
+
+    function todayLocalDate() {
+      const d = new Date();
+      return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+    }
+
+    function recordDate(item) {
+      if (item.date && /^\d{4}-\d{2}-\d{2}$/.test(item.date)) return item.date;
+      const d = new Date(item.createdAt);
+      if (Number.isNaN(d.getTime())) return todayLocalDate();
+      return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+    }
+
+    function recordMonth(item) {
+      return recordDate(item).slice(0, 7);
+    }
+
+    function formatDate(dateStr) {
+      const [y, m, d] = dateStr.split("-");
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatMonthLabel(monthKey) {
+      const [y, m] = monthKey.split("-");
+      return `${y}年${Number(m)}月`;
+    }
+
+    function money(n) {
+      return "¥" + Number(n).toFixed(2);
+    }
+
+    function half(amount) {
+      return Math.round((Number(amount) / 2) * 100) / 100;
+    }
+
+    function availableMonths() {
+      const set = new Set(records.map(recordMonth));
+      return Array.from(set).sort().reverse();
+    }
+
+    function filteredRecords() {
+      if (activeMonth === "all") return records.slice();
+      return records.filter((item) => recordMonth(item) === activeMonth);
+    }
+
+    function readImageAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) {
+          resolve(null);
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error("图片读取失败"));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderMonthFilters() {
+      const months = availableMonths();
+      if (activeMonth !== "all" && !months.includes(activeMonth)) {
+        activeMonth = "all";
+        localStorage.setItem(FILTER_KEY, activeMonth);
+      }
+
+      monthFilters.innerHTML = "";
+
+      const allBtn = document.createElement("button");
+      allBtn.type = "button";
+      allBtn.className = "month-btn" + (activeMonth === "all" ? " active" : "");
+      allBtn.textContent = "全部";
+      allBtn.addEventListener("click", () => {
+        activeMonth = "all";
+        localStorage.setItem(FILTER_KEY, activeMonth);
+        render();
+      });
+      monthFilters.appendChild(allBtn);
+
+      months.forEach((month) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "month-btn" + (activeMonth === month ? " active" : "");
+        btn.textContent = formatMonthLabel(month);
+        btn.addEventListener("click", () => {
+          activeMonth = month;
+          localStorage.setItem(FILTER_KEY, activeMonth);
+          render();
+        });
+        monthFilters.appendChild(btn);
+      });
+    }
+
+    function render() {
+      renderMonthFilters();
+
+      const list = filteredRecords().sort((a, b) => {
+        const da = recordDate(a);
+        const db = recordDate(b);
+        if (da !== db) return db.localeCompare(da);
+        return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+      });
+
+      tbody.innerHTML = "";
+
+      const scopeLabel =
+        activeMonth === "all" ? "全部" : formatMonthLabel(activeMonth);
+      sumTotalLabel.textContent = `总花费（${scopeLabel}）`;
+      sumLiLabel.textContent = `李明聪应付（${scopeLabel}）`;
+      sumZhangLabel.textContent = `张馥璐应付（${scopeLabel}）`;
+
+      if (!list.length) {
+        emptyState.style.display = "block";
+        emptyState.textContent = records.length
+          ? `当前筛选（${scopeLabel}）没有记录。`
+          : "还没有记录，先添加第一笔花费吧。";
+        sumTotal.textContent = money(0);
+        sumLi.textContent = money(0);
+        sumZhang.textContent = money(0);
+        return;
+      }
+
+      emptyState.style.display = "none";
+
+      let total = 0;
+      let liTotal = 0;
+      let zhangTotal = 0;
+
+      list.forEach((item) => {
+        const share = half(item.amount);
+        total += item.amount;
+        liTotal += share;
+        zhangTotal += share;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="date-cell">${formatDate(recordDate(item))}</td>
+          <td class="amount">${money(item.amount)}</td>
+          <td class="detail">${escapeHtml(item.detail)}</td>
+          <td class="img-cell"></td>
+          <td class="share">${money(share)}</td>
+          <td class="share">${money(share)}</td>
+          <td></td>
+        `;
+
+        const imgCell = tr.querySelector(".img-cell");
+        if (item.image) {
+          const img = document.createElement("img");
+          img.className = "thumb";
+          img.src = item.image;
+          img.alt = "附图";
+          img.addEventListener("click", () => openLightbox(item.image));
+          imgCell.appendChild(img);
+        } else {
+          imgCell.innerHTML = '<span class="no-img">—</span>';
+        }
+
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "btn-danger";
+        delBtn.textContent = "删除";
+        delBtn.addEventListener("click", () => {
+          if (confirm("确定删除这条记录？")) {
+            records = records.filter((r) => r.id !== item.id);
+            saveRecords();
+            render();
+          }
+        });
+        tr.lastElementChild.appendChild(delBtn);
+
+        tbody.appendChild(tr);
+      });
+
+      sumTotal.textContent = money(total);
+      sumLi.textContent = money(liTotal);
+      sumZhang.textContent = money(zhangTotal);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function openLightbox(src) {
+      lightboxImg.src = src;
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      lightboxImg.removeAttribute("src");
+    }
+
+    lightbox.addEventListener("click", closeLightbox);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeLightbox();
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const amount = Number(amountInput.value);
+      const detail = detailInput.value.trim();
+      if (!(amount > 0) || !detail) return;
+
+      try {
+        const image = await readImageAsDataURL(imageInput.files[0] || null);
+        const now = new Date();
+        records.unshift({
+          id: crypto.randomUUID(),
+          date: todayLocalDate(),
+          amount,
+          detail,
+          image,
+          createdAt: now.toISOString(),
+        });
+        saveRecords();
+        form.reset();
+        render();
+      } catch (err) {
+        alert(err.message || "添加失败");
+      }
+    });
+
+    exportBtn.addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(records, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const date = todayLocalDate();
+      a.href = url;
+      a.download = `李安琪花费备份-${date}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    render();
+  </script>
+</body>
+</html>
