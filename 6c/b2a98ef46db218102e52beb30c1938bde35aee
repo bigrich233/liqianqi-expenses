@@ -1,0 +1,19 @@
+data.js
+  s_2e197f19216c42::t_b057da5f15d61e 3,21-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.39-trip",
+  "base_commit_sha": "6cb2a98ef46db218102e52beb30c1938bde35aee",
+  "prompts": {},
+  "sessions": {
+    "s_2e197f19216c42": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "98116fac-5b58-45e1-a1e4-97548ad6b2c0",
+        "model": "default"
+      },
+      "human_author": "bigrich <bigrich@base.ctripsmartdns.com>"
+    }
+  }
+}
