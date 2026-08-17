@@ -1,6 +1,6 @@
 // 记账数据（由助手根据确认后的截图维护；version 变更后页面会刷新为最新数据）
 window.EXPENSE_DATA = {
-  version: 3,
+  version: 4,
   records: [
     {
       id: "2026-08-06-ovala",
@@ -41,6 +41,54 @@ window.EXPENSE_DATA = {
       detail: "HATA 哈达网红汽水（混合口味，京东自营）",
       image: "receipts/2026-08-10-hata汽水.jpg",
       createdAt: "2026-08-10T14:25:02+08:00",
+    },
+    {
+      id: "2026-08-17-casetify",
+      date: "2026-08-17",
+      amount: 38,
+      detail: "CASETiFY 手机壳（华强北微信转账）",
+      image: "receipts/2026-08-17-casetify手机壳.png",
+      createdAt: "2026-08-17T12:16:00+08:00",
+    },
+    {
+      id: "2026-08-17-zhongshu-notes",
+      date: "2026-08-17",
+      amount: 84,
+      detail: "钟书金牌尖子生笔记（5年级上 数学+英语）",
+      image: "receipts/2026-08-17-钟书尖子生笔记.jpg",
+      createdAt: "2026-08-17T12:16:01+08:00",
+    },
+    {
+      id: "2026-08-17-travel-socks",
+      date: "2026-08-17",
+      amount: 14.49,
+      detail: "儿童一次性旅行袜（旅行印迹，10双）",
+      image: "receipts/2026-08-17-一次性袜和内裤.jpg",
+      createdAt: "2026-08-17T12:16:02+08:00",
+    },
+    {
+      id: "2026-08-17-freego-underwear",
+      date: "2026-08-17",
+      amount: 20.36,
+      detail: "Freego 儿童一次性内裤 ×2",
+      image: "receipts/2026-08-17-一次性袜和内裤.jpg",
+      createdAt: "2026-08-17T12:16:03+08:00",
+    },
+    {
+      id: "2026-08-17-uniqlo-miffy",
+      date: "2026-08-17",
+      amount: 99,
+      detail: "优衣库 miffy UT 短袖（浅灰 XS）",
+      image: "receipts/2026-08-17-优衣库miffy短袖.jpg",
+      createdAt: "2026-08-17T12:16:04+08:00",
+    },
+    {
+      id: "2026-08-17-yli-wool",
+      date: "2026-08-17",
+      amount: 146,
+      detail: "外里美利奴羊毛衫（柔光白 S，含赠品收纳袋）",
+      image: "receipts/2026-08-17-外里美利奴羊毛衫.jpg",
+      createdAt: "2026-08-17T12:16:05+08:00",
     },
   ],
 };
