@@ -16,7 +16,6 @@
       --line: #d5cdc0;
       --surface: rgba(255, 252, 247, 0.92);
       --accent: #0f6b5c;
-      --danger: #b42318;
       --shadow: 0 18px 50px rgba(28, 25, 21, 0.08);
       --radius: 18px;
     }
@@ -146,92 +145,12 @@
       animation: rise 0.75s ease both;
     }
 
-    .form {
-      display: grid;
-      grid-template-columns: 140px 1fr 180px auto;
-      gap: 12px;
-      padding: 18px;
-      border-bottom: 1px solid var(--line);
-      align-items: end;
-    }
-
-    label {
-      display: grid;
-      gap: 6px;
-      font-size: 0.82rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    input[type="number"],
-    input[type="text"],
-    input[type="file"],
-    select {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 12px;
-      padding: 11px 12px;
-      font: inherit;
-      color: var(--ink);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(15, 107, 92, 0.12);
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-      align-items: end;
-    }
-
-    button {
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font: inherit;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.15s ease, background 0.2s;
-    }
-
-    button:active { transform: scale(0.98); }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      min-width: 96px;
-    }
-
-    .btn-primary:hover { opacity: 0.92; }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--line);
-    }
-
-    .btn-danger {
-      background: transparent;
-      color: var(--danger);
-      border: 1px solid transparent;
-      padding: 8px 10px;
-      font-size: 0.86rem;
-    }
-
-    .btn-danger:hover { background: rgba(180, 35, 24, 0.08); }
-
     .table-wrap { overflow-x: auto; }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 860px;
+      min-width: 780px;
     }
 
     th, td {
@@ -273,7 +192,7 @@
     .share { color: var(--accent); }
 
     .detail {
-      max-width: 280px;
+      max-width: 320px;
       line-height: 1.5;
       word-break: break-word;
     }
@@ -342,12 +261,6 @@
 
     @media (max-width: 800px) {
       .summary { grid-template-columns: 1fr; }
-      .form {
-        grid-template-columns: 1fr;
-        align-items: stretch;
-      }
-      .actions { justify-content: stretch; }
-      .actions button { flex: 1; }
     }
   </style>
 </head>
@@ -355,7 +268,7 @@
   <div class="wrap">
     <header>
       <h1>李安琪 · 花费记账</h1>
-      <p>每笔花费按金额自动 AA：李明聪与张馥璐各承担一半。日期按录入当天计算。</p>
+      <p>每笔花费按金额自动 AA：李明聪与张馥璐各承担一半。本页仅供查看。</p>
     </header>
 
     <div class="toolbar">
@@ -379,25 +292,6 @@
     </section>
 
     <section class="panel">
-      <form class="form" id="recordForm">
-        <label>
-          金额（元）
-          <input id="amount" type="number" min="0" step="0.01" placeholder="100" required />
-        </label>
-        <label>
-          明细
-          <input id="detail" type="text" placeholder="例如：奶粉、衣服、体检…" required />
-        </label>
-        <label>
-          附图
-          <input id="image" type="file" accept="image/*" />
-        </label>
-        <div class="actions">
-          <button class="btn-primary" type="submit">添加</button>
-          <button class="btn-ghost" type="button" id="exportBtn" title="导出备份">导出</button>
-        </div>
-      </form>
-
       <div class="table-wrap">
         <table>
           <thead>
@@ -408,17 +302,16 @@
               <th>附图</th>
               <th>李明聪</th>
               <th>张馥璐</th>
-              <th></th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
-        <div class="empty" id="emptyState">还没有记录，先添加第一笔花费吧。</div>
+        <div class="empty" id="emptyState">还没有记录。</div>
       </div>
     </section>
 
     <p class="footer-note">
-      确认后的记录保存在同目录的 data.js 和 receipts 文件夹中（会随 iCloud 同步）。你也可以在本页继续手动添加；建议定期「导出」备份。
+      数据由记账维护后同步更新，刷新页面即可看到最新记录。
     </p>
   </div>
 
@@ -428,14 +321,8 @@
 
   <script src="data.js"></script>
   <script>
-    const STORAGE_KEY = "liqianqi_expense_records_v1";
-    const VERSION_KEY = "liqianqi_expense_data_version_v1";
     const FILTER_KEY = "liqianqi_expense_month_filter_v1";
 
-    const amountInput = document.getElementById("amount");
-    const detailInput = document.getElementById("detail");
-    const imageInput = document.getElementById("image");
-    const form = document.getElementById("recordForm");
     const tbody = document.getElementById("tbody");
     const emptyState = document.getElementById("emptyState");
     const monthFilters = document.getElementById("monthFilters");
@@ -447,46 +334,12 @@
     const sumZhangLabel = document.getElementById("sumZhangLabel");
     const lightbox = document.getElementById("lightbox");
     const lightboxImg = document.getElementById("lightboxImg");
-    const exportBtn = document.getElementById("exportBtn");
 
-    /** @type {{id:string, date?:string, amount:number, detail:string, image:string|null, createdAt:string}[]} */
-    let records = loadRecords();
+    const records =
+      window.EXPENSE_DATA && Array.isArray(window.EXPENSE_DATA.records)
+        ? window.EXPENSE_DATA.records.slice()
+        : [];
     let activeMonth = localStorage.getItem(FILTER_KEY) || "all";
-
-    function fileRecords() {
-      const data = window.EXPENSE_DATA;
-      if (!data || !Array.isArray(data.records)) return [];
-      return data.records.slice();
-    }
-
-    function fileVersion() {
-      return window.EXPENSE_DATA && window.EXPENSE_DATA.version != null
-        ? String(window.EXPENSE_DATA.version)
-        : "0";
-    }
-
-    function loadRecords() {
-      const version = fileVersion();
-      const storedVersion = localStorage.getItem(VERSION_KEY);
-      if (storedVersion !== version) {
-        const fromFile = fileRecords();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(fromFile));
-        localStorage.setItem(VERSION_KEY, version);
-        return fromFile;
-      }
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch {
-        /* fall through */
-      }
-      return fileRecords();
-    }
-
-    function saveRecords() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-      localStorage.setItem(VERSION_KEY, fileVersion());
-    }
 
     function pad2(n) {
       return String(n).padStart(2, "0");
@@ -509,8 +362,7 @@
     }
 
     function formatDate(dateStr) {
-      const [y, m, d] = dateStr.split("-");
-      return `${y}-${m}-${d}`;
+      return dateStr;
     }
 
     function formatMonthLabel(monthKey) {
@@ -534,19 +386,6 @@
     function filteredRecords() {
       if (activeMonth === "all") return records.slice();
       return records.filter((item) => recordMonth(item) === activeMonth);
-    }
-
-    function readImageAsDataURL(file) {
-      return new Promise((resolve, reject) => {
-        if (!file) {
-          resolve(null);
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result));
-        reader.onerror = () => reject(new Error("图片读取失败"));
-        reader.readAsDataURL(file);
-      });
     }
 
     function renderMonthFilters() {
@@ -605,7 +444,7 @@
         emptyState.style.display = "block";
         emptyState.textContent = records.length
           ? `当前筛选（${scopeLabel}）没有记录。`
-          : "还没有记录，先添加第一笔花费吧。";
+          : "还没有记录。";
         sumTotal.textContent = money(0);
         sumLi.textContent = money(0);
         sumZhang.textContent = money(0);
@@ -632,7 +471,6 @@
           <td class="img-cell"></td>
           <td class="share">${money(share)}</td>
           <td class="share">${money(share)}</td>
-          <td></td>
         `;
 
         const imgCell = tr.querySelector(".img-cell");
@@ -646,19 +484,6 @@
         } else {
           imgCell.innerHTML = '<span class="no-img">—</span>';
         }
-
-        const delBtn = document.createElement("button");
-        delBtn.type = "button";
-        delBtn.className = "btn-danger";
-        delBtn.textContent = "删除";
-        delBtn.addEventListener("click", () => {
-          if (confirm("确定删除这条记录？")) {
-            records = records.filter((r) => r.id !== item.id);
-            saveRecords();
-            render();
-          }
-        });
-        tr.lastElementChild.appendChild(delBtn);
 
         tbody.appendChild(tr);
       });
@@ -691,44 +516,6 @@
     lightbox.addEventListener("click", closeLightbox);
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeLightbox();
-    });
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const amount = Number(amountInput.value);
-      const detail = detailInput.value.trim();
-      if (!(amount > 0) || !detail) return;
-
-      try {
-        const image = await readImageAsDataURL(imageInput.files[0] || null);
-        const now = new Date();
-        records.unshift({
-          id: crypto.randomUUID(),
-          date: todayLocalDate(),
-          amount,
-          detail,
-          image,
-          createdAt: now.toISOString(),
-        });
-        saveRecords();
-        form.reset();
-        render();
-      } catch (err) {
-        alert(err.message || "添加失败");
-      }
-    });
-
-    exportBtn.addEventListener("click", () => {
-      const blob = new Blob([JSON.stringify(records, null, 2)], {
-        type: "application/json",
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      const date = todayLocalDate();
-      a.href = url;
-      a.download = `李安琪花费备份-${date}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
     });
 
     render();
