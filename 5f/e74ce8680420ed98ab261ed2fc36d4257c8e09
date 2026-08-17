@@ -1,0 +1,19 @@
+index.html
+  s_1a53c7722afa06::t_361d17ce087e92 153,195,271,309,314,338-341,365,447
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.40-trip",
+  "base_commit_sha": "5fe74ce8680420ed98ab261ed2fc36d4257c8e09",
+  "prompts": {},
+  "sessions": {
+    "s_1a53c7722afa06": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "18838bbf-4362-45cf-b1c2-96637afd1531",
+        "model": "default"
+      },
+      "human_author": "bigrich <bigrich@base.ctripsmartdns.com>"
+    }
+  }
+}
